@@ -12,23 +12,24 @@ $$
 y_1 = x_1w_1+x_2w_2+x_3w_3+x_4w_4 +b_1
 $$
 
+ 하나의 퍼셉트론에 관한 식을 반복문을 사용하는 것보다 백터를 사용하면 간단하고 빠르게 구할 수 있어집니다.그래서 이를 다시 적으면 다음과 같아집니다.
 
- 하나의 퍼셉트론에 관한 식을 반복문을 사용하는 것보다 백터를 사용하면 간단하고 빠르게 구할 수 있어집니다.그래서 이를 다시 적으면 다음과 같아집니다.(x[N,M],])
+이때 입력백터  **x**(1,X),가중치 백터 **w**(X,1)이 됩니다.
 $$
 y_1=\mathbf{x}(1,X)\mathbf{w}(X,1) +b_1
 $$
-이를 단층 퍼셉트론 신경망은 퍼셉트론이 n개 있을 때 하나의 입력벡터 **x**(1,X) 를 통해 출력 y가 n개가 나옵니다. 그와 동시에 가중치 행렬과 편행 벡터가 사용 되어 출력 벡터 **y**(N,Y)는 다음과 같이 표현할 수 있습니다. 
+이를 단층 퍼셉트론 신경망은 퍼셉트론이 n개 있을 때 하나의 입력벡터 **x**(1,X) 를 통해 출력 y가 n개가 나옵니다. 그와 동시에 가중치 행렬**W**(X,N)과 편행 벡터**b**(1,N)가 사용 되어 출력 벡터 **y**(1,Y)는 다음과 같이 표현할 수 있습니다. 
 $$
-\mathbf{y}(1,N)=\mathbf{x}(1,X)\mathbf{W}(X,N)+\mathbf{b}(N,N)
+\mathbf{y}(1,N)=\mathbf{x}(1,X)\mathbf{W}(X,N)+\mathbf{b}(1,N)
 $$
-여기서 더 나아가 입력 백터를 미니배치를 사용하게 되면 입력벡터 **x**와 출력벡터 **y** 는 벡터에서 행렬로 표현할 수 있게 됩니다. 
+여기서 더 나아가 입력 백터를 미니배치를 사용하게 되면 입력벡터 **x**와 출력벡터 **y** 는 벡터에서 **X**(N,X),**Y**(M,N)행렬로 표현할 수 있게 됩니다. 
 $$
-\mathbf{Y}(M,N)=\mathbf{X}(N,X)\mathbf{W}(X,N)+\mathbf{b}(M,N)
+\mathbf{Y}(M,N)=\mathbf{X}(M,X)\mathbf{W}(X,N)+\mathbf{b}(M,N)
 $$
 
    
 
-이때 저희가 할 전복 데이터로는 (4177,11)를 사용하여 **X**(4177,10)형태의 입력 행렬과 **Y**(4177,1) 형태의 출력행렬 로 나타낼 수 있고 이때 가중치 **W**는 (10,1) 이됩니다.(**X**(4177,10)**W**(10,1) = **Y**(4177,1))
+이때 저희가 할 전복 데이터로는 (M,11)를 사용하여 입력 행렬 **X**(M,10)와 출력 행렬과 **Y**(M,1) 나타낼 수 있고 이때 가중치 **W**는 (10,1) 이됩니다.(**X**(4177,10)**W**(10,1) = **Y**(4177,1))
 
 
 
@@ -92,6 +93,11 @@ def forward_postproc(self, output, y):
 이때 loss의 손실 기울기 1로부터$loss = (output - y)^2/n$ 를 output으로 편미분을 하게 되면 ${\partial L\over\partial {output}} = {\partial L\over\partial {square}}{\partial {square}\over\partial {diff}}{\partial {diff}\over\partial {output}}$ 으로 구할 수 있습니다.
 
  ${\partial L\over\partial {square}}={1\over n}$   (g_loss_square,이때 n=10*1), ${\partial {square}\over\partial {diff}}=2diff$  (g_square_diff)     ${\partial {diff}\over\partial {output}}=1$   (g_diff_output)의 손실 기울기를 구합니다.  결국 ${\partial L\over\partial {output}} = {\partial L\over\partial {square}}{\partial {square}\over\partial {diff}}{\partial {diff}\over\partial {output}} = {2diff\over n}$ 와 같아 집니다.
+$$
+{\partial L\over\partial {square}}={1\over n}\\
+{\partial {square}\over\partial {diff}}=2diff\\
+$$
+
 
 
 
@@ -109,7 +115,7 @@ def backprop_postproc(self, G_loss, diff):
 
     return G_output
 ```
-이후 ${\partial L\over\partial {output}}$(G_output[mb_size(10),1])와 입력행렬**X**[mb_size(10),10]를 이용하여    ${\partial L\over\partial {w}}={X^T}G_{output}$ 와 ${\partial L\over\partial {b}}$ 은 G_output의 합를 구한 후 $w_{i+1} = w_i-\alpha{\partial L\over\partial {w}} $ 와 $b_{i+1} = x_i-\alpha{\partial L\over\partial {b}} $ 를 구하게됩니다.
+이후 ${\partial L\over\partial {output}}$(G_output[mb_size(10),1])와 입력행렬 **X**[mb_size(10),10]를 이용하여 ${\partial L\over\partial {w}}={X^T}G_{output}$ 와 ${\partial L\over\partial {b}}$ = G_output의 합를 구한 후 가중치와 편향값을 업데이트 하게 됩니다( $w_{i+1} = w_i-\alpha{\partial L\over\partial {w}} $ 와 $b_{i+1} = x_i-\alpha{\partial L\over\partial {b}} $ )
 
 ```python
 def backprop_neuralnet(self, G_output, x):
