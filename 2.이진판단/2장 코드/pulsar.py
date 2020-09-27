@@ -35,10 +35,11 @@ class Pulsar():
 
             for row in csvreader:
                 rows.append(row)
-            print(len(rows))
+            # print(len(rows))
             self.input_cnt, self.output_cnt = 8, 1
             self.data = np.asarray(rows, dtype='float32')
-            print(self.data.shape)
+            # print(self.data.shape)
+
 
     def init_model(self):
         self.weight = np.random.normal(self.RND_MEAN, self.RND_STD, [self.input_cnt, self.output_cnt])
@@ -145,9 +146,9 @@ class Pulsar():
     def backprop_postproc(self, G_loss, aux):
         y, output, entropy = aux
         g_loss_entropy = 1.0 / np.prod(entropy.shape)
-        print(g_loss_entropy)
+        # print(g_loss_entropy)
         g_entropy_output = self.sigmoid_cross_entropy_with_logits_derv(y, output)
-        print(g_entropy_output.shape)
+        # print(g_entropy_output.shape)
         G_entropy = g_loss_entropy * G_loss
         G_output = g_entropy_output * G_entropy
 
