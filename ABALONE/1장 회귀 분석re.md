@@ -128,7 +128,7 @@ def backprop_neuralnet(self, G_output, x):
     self.bias -= self.LEARNING_RATE * G_b
 ```
 
-이과정을 미니배치 수만큼 진행을 하면서 설정한 report에 맞추어 loss와 정확도를 출력하고 모든 epoch이 끝난 후 테스트를 진행하는데 입력 행렬test_x[837,10] 과 w_fin[837,1]을 이용하여  $\mathbf{Y}=\mathbf{X}\mathbf{W}+\mathbf{b} $  output(Y)을 구한후이를 test_y[837,1] 과 비교하여 정확도(정답과 오차의 비율)를 계산합니다.
+이과정을 미니배치 수만큼 진행을 하면서 설정한 report에 맞추어 loss와 정확도를 출력하고 모든 epoch이 끝난 후 테스트를 진행하는데 입력 행렬test_x[837,10] 과 w_fin[837,1]을 이용하여  $\mathbf{Y}=\mathbf{X}\mathbf{W}+\mathbf{b} $   즉, output(Y)을 구한후이를 test_y[837,1] 과 비교하여 정확도(정답과 오차의 비율)를 계산합니다.
 
 ```python
 def run_test(self, x, y):

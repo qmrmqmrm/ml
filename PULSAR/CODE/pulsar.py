@@ -28,7 +28,8 @@ class Pulsar():
         self.train_and_test(epoch_count, mb_size, report)
 
     def load_pulsar_dataset(self):
-        with open('./pulsar_stars.csv') as csvfile:
+        print("pulsar:load_pulsar_dataset")
+        with open('C:\\Users\\jm\\Documents\\GitHub\\ml\\PULSAR\\CODE\\pulsar_stars.csv') as csvfile:
             csvreader = csv.reader(csvfile)
             next(csvreader, None)
             rows = []
@@ -47,23 +48,18 @@ class Pulsar():
         # print("b",self.bias.shape)
 
     def train_and_test(self, epoch_count, mb_size, report):
+        print("pulsar:train_and_test")
         step_count = self.arrange_data(mb_size)
         # print(step_count)
         test_x, test_y = self.get_test_data()
-
-        # print(test_x.shape,test_y.shape)
 
         for epoch in range(epoch_count):
             losses, accs = [], []
 
             for n in range(step_count):
-                # print(f"{n+1} step")
                 train_x, train_y = self.get_train_data(mb_size, n)
-                # print("train",train_x.shape,train_y.shape)
                 loss, acc = self.run_train(train_x, train_y)
-                # print(loss,acc)
                 losses.append(loss)
-                # print(f"len(losses):{len(losses)}")
                 accs.append(acc)
 
             if report > 0 and (epoch + 1) % report == 0:
@@ -76,11 +72,9 @@ class Pulsar():
 
     def arrange_data(self, mb_size):
         self.shuffle_map = np.arange(self.data.shape[0])
-        # print(f"{self.shuffle_map.shape}")
         np.random.shuffle(self.shuffle_map)
-        # print(int(self.data.shape[0] * 0.8) )
         step_count = int(self.data.shape[0] * 0.8) // mb_size
-        # print(f"step{step_count}")
+        print(f"step{step_count}")
         self.test_begin_idx = step_count * mb_size
         # print(f"self.test_idx{self.test_begin_idx}")
         return step_count
