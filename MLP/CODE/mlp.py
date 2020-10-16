@@ -9,12 +9,12 @@ np.random.seed(1234)
 
 # def randomize(): np.random.seed(time.time())
 
-class Mlp(Pulsar):
+class Mlp(Steel):
     def __init__(self):
 
         self.RND_MEAN = 0
         self.RND_STD = 0.0030
-        self.LEARNING_RATE = 0.001
+        self.LEARNING_RATE = 0.0001
         self.input_cnt = None
         self.output_cnt = None
         self.hidden_cnt = None
@@ -55,12 +55,13 @@ class Mlp(Pulsar):
         x, hidden = aux
         # print(hidden.shape,G_output.shape)
         g_output_w_out = hidden.transpose()
-
-        # print(g_output_w_out.shape)
+        print(f"hidden{hidden.shape},G_output:{G_output.shape}")
+        # print(f"g_output_w_out{g_output_w_out.shape}")
         G_w_out = np.matmul(g_output_w_out, G_output)
         G_b_out = np.sum(G_output, axis=0)
         # print(G_w_out.shape)
         g_output_hidden = self.pm_output['w'].transpose()
+        print(f"g_output_hidden: {g_output_hidden.shape}")
         G_hidden = np.matmul(G_output, g_output_hidden)
         # print((G_hidden.shape))
         self.pm_output['w'] -= self.LEARNING_RATE * G_w_out
@@ -195,11 +196,11 @@ class Mlp(Pulsar):
 
 def main():
     mlp = Mlp()
-    mlp.set_hidden([12,6])
+    mlp.set_hidden([12,6,4])
     # mlp.abalone_exec(epoch_count=50 ,report=10)
     # mlp.abalone_exec(epoch_count=50, report=10)
-    mlp.pulsar_exec(epoch_count=50,report=10)
-    # mlp.steel_exec(epoch_count=50,report=10)
+    # mlp.pulsar_exec(epoch_count=50,report=10)
+    mlp.steel_exec(epoch_count=50,report=10)
 
 
 if __name__ == '__main__':
