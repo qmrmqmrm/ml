@@ -126,6 +126,11 @@ class Abalone():
 
         G_w = np.matmul(g_output_w, G_output)
         G_b = np.sum(G_output, axis=0)
+        g = 0
+        a = 0
+        np.square()
+        g += a * g + (1 - a)* G_w ** 2
+        self.weight += - self.LEARNING_RATE(G_w / np.sqrt(g) + 1.0e-10)
 
         self.weight -= self.LEARNING_RATE * G_w
         self.bias -= self.LEARNING_RATE * G_b

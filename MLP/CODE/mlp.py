@@ -9,12 +9,12 @@ np.random.seed(1234)
 
 # def randomize(): np.random.seed(time.time())
 
-class Mlp(Steel):
+class Mlp(Abalone):
     def __init__(self):
 
         self.RND_MEAN = 0
         self.RND_STD = 0.0030
-        self.LEARNING_RATE = 0.0001
+        self.LEARNING_RATE = 0.001
         self.input_cnt = None
         self.output_cnt = None
         self.hidden_cnt = None
@@ -179,28 +179,14 @@ class Mlp(Steel):
         else:
             self.hidden_config = info
 
-    # def abalone_exec(self, epoch_count=10, mb_size=20, report=1):
-    #     self.load_abalone_dataset()
-    #     self.init_model()
-    #     self.train_and_test(epoch_count, mb_size, report)
-
-    # def pulsar_exec(self, epoch_count=10, mb_size=334, report=1):
-    #     self.load_pulsar_dataset()
-    #     self.init_model()
-    #     self.train_and_test(epoch_count, mb_size, report)
-    #
-    # def steel_exec(self, epoch_count=10, mb_size=10, report=1):
-    #     self.load_steel_dataset()
-    #     self.init_model()
-    #     self.train_and_test(epoch_count, mb_size, report)
 
 def main():
     mlp = Mlp()
     mlp.set_hidden([12,6,4])
-    # mlp.abalone_exec(epoch_count=50 ,report=10)
+    mlp.abalone_exec(epoch_count=50 ,report=10)
     # mlp.abalone_exec(epoch_count=50, report=10)
     # mlp.pulsar_exec(epoch_count=50,report=10)
-    mlp.steel_exec(epoch_count=50,report=10)
+    # mlp.steel_exec(epoch_count=50,report=10)
 
 
 if __name__ == '__main__':
