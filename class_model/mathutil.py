@@ -87,18 +87,17 @@ def load_image_pixels(imagepath, resolution, input_shape):
 
 
 def draw_images_horz(xs, image_shape=None):
-    if image_shape != None:
-        show_cnt = len(xs)
-        fig, axes = plt.subplots(1, show_cnt, figsize=(5,5))
-        for n in range(show_cnt):
-            img = xs[n]
-            if image_shape:
-                x3d = img.reshape(image_shape)
-                img = Image.fromarray(np.uint8(x3d))
-            axes[n].imshow(img)
-            axes[n].axis('off')
-        plt.draw()
-        plt.show()
+    show_cnt = len(xs)
+    fig, axes = plt.subplots(1, show_cnt, figsize=(5,5))
+    for n in range(show_cnt):
+        img = xs[n]
+        if image_shape:
+            x3d = img.reshape(image_shape)
+            img = Image.fromarray(np.uint8(x3d))
+        axes[n].imshow(img)
+        axes[n].axis('off')
+    plt.draw()
+    plt.show()
 
 
 def show_select_results(est, ans, target_names, max_cnt=0):

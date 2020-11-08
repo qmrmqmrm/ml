@@ -15,7 +15,7 @@ class Regression(DataSet):
 
         return loss, aux
 
-    def dataset_backprop_postproc(self, G_loss, aux):
+    def dataset_backprop_post_proc(self, G_loss, aux):
         diff = aux
         shape = diff.shape
 

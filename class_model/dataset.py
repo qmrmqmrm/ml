@@ -7,10 +7,8 @@ import os
 class DataSet(DatasetBase):
     def __init__(self, name, mode):
         super(DataSet, self).__init__(name, mode)
-        # self.image_shape = None
-        # self.target_names = None
 
-        if name == 'abalone':
+        if self.name == 'abalone':
             rows, _ = mu.load_csv('../data/abalone.csv')
 
             xs = np.zeros([len(rows), 10])
@@ -28,31 +26,26 @@ class DataSet(DatasetBase):
 
             self.dataset_shuffle_data(xs, ys, 0.8)
 
-        elif name == 'pulsar':
+        elif self.name == 'pulsar':
             rows, _ = mu.load_csv('../data/pulsar_stars.csv')
             data = np.asarray(rows, dtype='float32')
             self.dataset_shuffle_data(data[:, :-1], data[:, -1:], 0.8)
             self.target_names = ['별', '펄서']
 
-
-        elif name == 'steel':
+        elif self.name == 'steel':
             rows, headers = mu.load_csv('../data/faults.csv')
             data = np.asarray(rows, dtype='float32')
             self.dataset_shuffle_data(data[:, :-7], data[:, -7:], 0.8)
 
             self.target_names = headers[-7:]
 
-            def visualize(self, xs, estimates, answers):
-                mu.show_select_results(estimates, answers, self.target_names)
-
-        elif name == 'pulsarselect':
+        elif self.name == 'pulsarselect':
             rows, _ = mu.load_csv('../data/pulsar_stars.csv')
             data = np.asarray(rows, dtype='float32')
             self.dataset_shuffle_data(data[:, :-1], mu.onehot(data[:, -1], 2), 0.8)
             self.target_names = ['별', '펄서']
 
-
-        elif name == 'flower':
+        elif self.name == 'flower':
             resolution = [100,100]
             input_shape = [-1]
             path = '../data/flowers'
@@ -75,7 +68,6 @@ class DataSet(DatasetBase):
             xs = np.asarray(images, np.float32)
             ys = mu.onehot(idxs, len(self.target_names))
             self.dataset_shuffle_data(xs, ys, 0.8)
-
 
     def dataset_get_train_data(self, batch_size, nth):
         from_idx = nth * batch_size
@@ -131,30 +123,6 @@ class DataSet(DatasetBase):
         self.output_shape = ys[0].shape  # 5
         return indices[tr_from:tr_to], indices[va_from:va_to], indices[te_from:te_to]
 
-    def visualize(self, xs, estimates, answers):
-        if self.name == "abalone":
-            for n in range(len(xs)):
-                x, est, ans = xs[n], estimates[n], answers[n]
-                xstr = mu.vector_to_str(x, '%4.2f')
-                print('{} => 추정 {:4.1f} : 정답 {:4.1f}'.format(xstr, est[0], ans[0]))
-
-        elif self.name == "pulsar":
-            for n in range(len(xs)):
-                x, est, ans = xs[n], estimates[n], answers[n]
-                xstr = mu.vector_to_str(x, '%5.1f', 3)
-                estr = self.target_names[int(round(est[0]))]
-                astr = self.target_names[int(round(ans[0]))]
-                rstr = 'O'
-                if estr != astr: rstr = 'X'
-                print('{} => 추정 {}(확률 {:4.2f}) : 정답 {} => {}'.format(xstr, estr, est[0], astr, rstr))
-        elif self.name == 'steel':
-            mu.show_select_results(estimates, answers, self.target_names)
-        elif self.name == "pulsarselect":
-            mu.show_select_results(estimates, answers, self.target_names)
-        elif self.name == "flower":
-            mu.draw_images_horz(xs, self.image_shape)
-            mu.show_select_results(estimates, answers, self.target_names)
-
     def dataset_forward_postproc(self, output, y):
         pass
 
@@ -167,6 +135,48 @@ class DataSet(DatasetBase):
     def dataset_get_estimate(self, output):
         pass
 
-    # def visualize(self, xs, estimates, answers):
-    #     mu.draw_images_horz(xs, self.image_shape)
-    #     mu.show_select_results(estimates, answers, self.target_names)
+    def visualize(self, xs, estimates, answers):
+        print(f"self.name{self.name}")
+        if self.name == 'abalone':
+            for n in range(len(xs)):
+                x, est, ans = xs[n], estimates[n], answers[n]
+                xstr = mu.vector_to_str(x, '%4.2f')
+                print('{} => 추정 {:4.1f} : 정답 {:4.1f}'.
+                      format(xstr, est[0], ans[0]))
+        elif self.name == 'pulsar':
+
+            for n in range(len(xs)):
+                x, est, ans = xs[n], estimates[n], answers[n]
+                xstr = mu.vector_to_str(x, '%5.1f', 3)
+                estr = self.target_names[int(round(est[0]))]
+                astr = self.target_names[int(round(ans[0]))]
+                rstr = 'O'
+                if estr != astr: rstr = 'X'
+                print('{} => 추정 {}(확률 {:4.2f}) : 정답 {} => {}'.format(xstr, estr, est[0], astr, rstr))
+
+        elif self.name == 'steel':
+
+            mu.show_select_results(estimates, answers, self.target_names)
+
+        elif self.name == 'pulsarselect':
+
+            mu.show_select_results(estimates, answers, self.target_names)
+
+        elif self.name == 'flower':
+
+            mu.draw_images_horz(xs, self.image_shape)
+            mu.show_select_results(estimates, answers, self.target_names)
+
+
+        # elif self.name == 'office31':
+        #     # print(f"estimates{estimates}\n{answers}")
+        #     mu.draw_images_horz(xs, self.image_shape)
+        #     # print(f"estimates type {type(estimates)} shape {estimates.shape}")
+        #     ests, anss = np.hsplit(estimates, self.cnts), np.hsplit(answers, self.cnts)
+        #
+        #     captions = ['도메인', '상품']
+        #     # print(f"self.target_names,{len(self.target_names[0])},\n,{len(self.target_names[1])}")
+        #     for m in range(2):
+        #         print('[ {} 추정결과 ]'.format(captions[m]))
+        #         print(f"ests[{m}]{ests[m].shape}")
+        #         mu.show_select_results(ests[m], anss[m], self.target_names[m], 8)

@@ -79,7 +79,6 @@ class MlpModel(ModelBase):
         deX, deY = self.dataset.dataset_get_validate_data(num)
         est = self.get_estimate(deX)
         self.dataset.visualize(deX, est, deY)
-        # self.dataset.visualize()
 
     def train_step(self, x, y):
         self.is_training = True  # train 플래그 활성화
