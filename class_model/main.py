@@ -10,7 +10,7 @@ np.random.seed(1234)
 
 def main():
     data = dm.Select('flower', 'select')
-    model = mm.MlpModel("flower_model", data, [10])
+    model = mm.MlpModel("flower_model", data, [10,20])
     model.exec_all(epoch_count=50, report=10)
 
 

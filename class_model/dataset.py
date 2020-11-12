@@ -7,7 +7,9 @@ import os
 class DataSet(DatasetBase):
     def __init__(self, name, mode):
         super(DataSet, self).__init__(name, mode)
-
+        # print("dataset init")
+        resolution = [100, 100]
+        input_shape = [-1]
         if self.name == 'abalone':
             rows, _ = mu.load_csv('../data/abalone.csv')
 
@@ -46,8 +48,7 @@ class DataSet(DatasetBase):
             self.target_names = ['별', '펄서']
 
         elif self.name == 'flower':
-            resolution = [100,100]
-            input_shape = [-1]
+
             path = '../data/flowers'
             self.target_names = mu.list_dir(path)
 
@@ -69,7 +70,44 @@ class DataSet(DatasetBase):
             ys = mu.onehot(idxs, len(self.target_names))
             self.dataset_shuffle_data(xs, ys, 0.8)
 
+        elif self.name == 'office31':
+            path = '../data/domain_adaptation_images'
+            domain_names = mu.list_dir(path)
+
+            images = []
+            didxs, oidxs = [], []
+            object_names = None
+
+            for dx, dname in enumerate(domain_names):
+                domainpath = os.path.join(path, dname, 'images')
+                object_names = mu.list_dir(domainpath)
+
+                for ox, oname in enumerate(object_names):
+                    objectpath = os.path.join(domainpath, oname)
+                    filenames = mu.list_dir(objectpath)
+                    for fname in filenames:
+                        if fname[-4:] != '.jpg':
+                            continue
+                        imagepath = os.path.join(objectpath, fname)
+                        pixels = mu.load_image_pixels(imagepath, resolution, input_shape)
+                        images.append(pixels)
+                        didxs.append(dx)
+                        oidxs.append(ox)
+            self.image_shape = resolution + [3]
+
+            xs = np.asarray(images, np.float32)  # shape(4110, 30000)
+
+            ys0 = mu.onehot(didxs, len(domain_names))  # ys0.shape(4110, 3)
+            ys1 = mu.onehot(oidxs, len(object_names))  # ys1.shape(4110, 31)
+            ys = np.hstack([ys0, ys1])  # ys.shape(4110, 34)
+
+            self.dataset_shuffle_data(xs, ys, 0.8)
+            self.target_names = [domain_names, object_names]
+            print(type(self.target_names[0]))
+            self.cnts = [len(domain_names)]
+
     def dataset_get_train_data(self, batch_size, nth):
+        # print("dataset dataset_get_train_data")
         from_idx = nth * batch_size
         to_idx = (nth + 1) * batch_size
 
@@ -80,14 +118,17 @@ class DataSet(DatasetBase):
         return tr_X, tr_Y
 
     def dataset_get_test_data(self):
+        # print("dataset dataset_get_test_data")
         return self.te_xs, self.te_ys
 
     def dataset_shuffle_train_data(self, size):
+        # print("dataset dataset_shuffle_train_data")
         self.indices = np.arange(size)
         # print(self.indices)
         np.random.shuffle(self.indices)
 
     def dataset_get_validate_data(self, count):
+        # print("dataset dataset_get_validate_data")
         self.va_indices = np.arange(len(self.va_xs))  # (216)
         np.random.shuffle(self.va_indices)
 
@@ -97,6 +138,7 @@ class DataSet(DatasetBase):
         return va_X, va_Y
 
     def dataset_shuffle_data(self, xs, ys, tr_ratio=0.8, va_ratio=0.05):
+        # print("dataset dataset_shuffle_data")
         data_count = len(xs)  # 4323
 
         tr_cnt = int(data_count * tr_ratio / 10) * 10  # 3450
@@ -126,7 +168,7 @@ class DataSet(DatasetBase):
     def dataset_forward_postproc(self, output, y):
         pass
 
-    def dataset_backprop_post_proc(self, G_loss, aux):
+    def dataset_backprop_postproc(self, G_loss, aux):
         pass
 
     def dataset_eval_accuracy(self, x, y, output):
@@ -136,7 +178,8 @@ class DataSet(DatasetBase):
         pass
 
     def visualize(self, xs, estimates, answers):
-        print(f"self.name{self.name}")
+        # print("dataset visualize")
+        # print(f"self.name{self.name}")
         if self.name == 'abalone':
             for n in range(len(xs)):
                 x, est, ans = xs[n], estimates[n], answers[n]
@@ -168,15 +211,15 @@ class DataSet(DatasetBase):
             mu.show_select_results(estimates, answers, self.target_names)
 
 
-        # elif self.name == 'office31':
-        #     # print(f"estimates{estimates}\n{answers}")
-        #     mu.draw_images_horz(xs, self.image_shape)
-        #     # print(f"estimates type {type(estimates)} shape {estimates.shape}")
-        #     ests, anss = np.hsplit(estimates, self.cnts), np.hsplit(answers, self.cnts)
-        #
-        #     captions = ['도메인', '상품']
-        #     # print(f"self.target_names,{len(self.target_names[0])},\n,{len(self.target_names[1])}")
-        #     for m in range(2):
-        #         print('[ {} 추정결과 ]'.format(captions[m]))
-        #         print(f"ests[{m}]{ests[m].shape}")
-        #         mu.show_select_results(ests[m], anss[m], self.target_names[m], 8)
+        elif self.name == 'office31':
+            # print(f"estimates{estimates}\n{answers}")
+            mu.draw_images_horz(xs, self.image_shape)
+            # print(f"estimates type {type(estimates)} shape {estimates.shape}")
+            ests, anss = np.hsplit(estimates, self.cnts), np.hsplit(answers, self.cnts)
+
+            captions = ['도메인', '상품']
+            # print(f"self.target_names,{len(self.target_names[0])},\n,{len(self.target_names[1])}")
+            for m in range(2):
+                print('[ {} 추정결과 ]'.format(captions[m]))
+                print(f"ests[{m}]{ests[m].shape}")
+                mu.show_select_results(ests[m], anss[m], self.target_names[m], 8)

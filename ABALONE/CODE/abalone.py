@@ -30,7 +30,7 @@ class Abalone():
 
     def load_abalone_dataset(self):
         # print("abalone:load_abalone_dataset")
-        with open('C:\\Users\\jm\\Documents\\GitHub\\ml\\ABALONE\\CODE\\abalone.csv') as csvfile:
+        with open('abalone.csv') as csvfile:
             csvreader = csv.reader(csvfile)
             next(csvreader, None)
             rows = []
@@ -126,11 +126,6 @@ class Abalone():
 
         G_w = np.matmul(g_output_w, G_output)
         G_b = np.sum(G_output, axis=0)
-        g = 0
-        a = 0
-        np.square()
-        g += a * g + (1 - a)* G_w ** 2
-        self.weight += - self.LEARNING_RATE(G_w / np.sqrt(g) + 1.0e-10)
 
         self.weight -= self.LEARNING_RATE * G_w
         self.bias -= self.LEARNING_RATE * G_b

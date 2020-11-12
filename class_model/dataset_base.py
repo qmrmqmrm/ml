@@ -12,7 +12,6 @@ class DatasetBase:
     def dataset_get_train_data(self, batch_size, nth):
         pass
 
-    def dataset_get_test_data(self):
         pass
 
     def dataset_shuffle_train_data(self, size):
@@ -28,14 +27,23 @@ class DatasetBase:
         pass
 
     def dataset_train_prt_result(self, epoch, costs, accs, acc, time1, time2):
-        print('    Epoch {}: cost={:5.3f}, accuracy={:5.3f}/{:5.3f} ({}/{} secs)'.format(epoch, np.mean(costs),
+        if self.name == 'office31':
+            acc_pair = np.mean(accs, axis=0)
+            print(f'    Epoch {epoch}: cost={np.mean(costs):5.3f}, accuracy={acc_pair[0]:5.3f}'
+                  f'+{acc_pair[1]:5.3f}/{acc[0]:5.3f}+{acc[1]:5.3f} ({time1}/{time2} secs)')
+
+        else:
+            print('    Epoch {}: cost={:5.3f}, accuracy={:5.3f}/{:5.3f} ({}/{} secs)'.format(epoch, np.mean(costs),
                                                                                          np.mean(accs), acc, time1,
                                                                                          time2))
 
     def dataset_test_prt_result(self, name, acc, time):
-        print('Model {} test report: accuracy = {:5.3f}, ({} secs)\n'.format(name, acc, time))
+        if self.name == 'office31':
+            print('Model {} test report: accuracy = {:5.3f}+{:5.3f}, ({} secs)\n'.format(name, acc[0], acc[1], time))
+
+        else:
+            print('Model {} test report: accuracy = {:5.3f}, ({} secs)\n'.format(name, acc, time))
 
     @property
     def train_count(self):
         return len(self.tr_xs)
-

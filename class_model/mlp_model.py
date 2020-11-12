@@ -12,10 +12,11 @@ class MlpModel(ModelBase):
         self.init_parameters(hconfigs)
 
     def init_parameters(self, hconfigs):
+        # print("mlp init_parameters")
         self.hconfigs = hconfigs
         self.pm_hiddens = []
         prev_shape = self.dataset.input_shape
-        # print(prev_shape)
+        print(prev_shape)
         for hconfig in hconfigs:
             pm_hidden, prev_shape = self.alloc_layer_param(prev_shape, hconfig)
             self.pm_hiddens.append(pm_hidden)
@@ -24,18 +25,22 @@ class MlpModel(ModelBase):
         self.pm_output, _ = self.alloc_layer_param(prev_shape, output_cnt)
 
     def alloc_layer_param(self, input_shape, hconfig):
+        # print("mlp alloc_layer_param")
         input_cnt = np.prod(input_shape)
         output_cnt = hconfig
         weight, bias = self.alloc_param_pair([input_cnt, output_cnt])
+        print(f"weight.shape{weight.shape}")
 
         return {'w':weight, 'b':bias}, output_cnt
 
     def alloc_param_pair(self, shape):
+        # print("mlp alloc_param_pair")
         weight = np.random.normal(0, self.rand_std, shape)
         bias = np.zeros([shape[-1]])
         return weight, bias
 
     def train(self, epoch_count=10, batch_size=10, learning_rate=0.001, report=0):
+        # print("mlp train")
         self.learning_rate = learning_rate
 
         batch_count = int(self.dataset.train_count / batch_size)  # train_count = 3450 -> flower데이터의 80%, batch_count = 345
@@ -68,6 +73,7 @@ class MlpModel(ModelBase):
         print('Model {} train ended in {} secs:'.format(self.name, tm_total))
 
     def test(self):
+        # print("mlp test")
         teX, teY = self.dataset.dataset_get_test_data()  # teX(657,30000), teY(657,5)
         time1 = int(time.time())
         acc = self.eval_accuracy(teX, teY)
@@ -75,12 +81,14 @@ class MlpModel(ModelBase):
         self.dataset.dataset_test_prt_result(self.name, acc, time2 - time1)
 
     def load_visualize(self, num):
+        # print("mlp load_visualize")
         print('Model {} Visualization'.format(self.name))
         deX, deY = self.dataset.dataset_get_validate_data(num)
         est = self.get_estimate(deX)
         self.dataset.visualize(deX, est, deY)
 
     def train_step(self, x, y):
+        # print("mlp train_step")
         self.is_training = True  # train 플래그 활성화
         # print(x.shape)
         output, aux_nn = self.forward_neuralnet(x)  # mlp_forward_neuralnet 호출, x(10,30000)
@@ -96,6 +104,7 @@ class MlpModel(ModelBase):
         return loss, accuracy
 
     def forward_neuralnet(self, x):
+        # print("mlp forward_neuralnet")
         hidden = x
         # print(self.hconfigs)
         aux_layers = []
@@ -103,12 +112,13 @@ class MlpModel(ModelBase):
         for n, hconfig in enumerate(self.hconfigs):
             hidden, aux = self.forward_layer(hidden, hconfig, self.pm_hiddens[n])  # mlp_forward_layer호출, 히든계층
             aux_layers.append(aux)
-        # print(hidden.shape)
+        # print(f"hidden.shape{hidden.shape}")
         output, aux_out = self.forward_layer(hidden, None, self.pm_output)  # 출력계층
         # print(output.shape)
         return output, [aux_out, aux_layers]
 
     def backprop_neuralnet(self,G_output, aux):
+        # print("mlp backprop_neuralnet")
         aux_out, aux_layers = aux
 
         G_hidden = self.backprop_layer(G_output, None, self.pm_output, aux_out)  # 출력계층 역전파
@@ -120,12 +130,14 @@ class MlpModel(ModelBase):
         return G_hidden
 
     def forward_layer(self, x, hconfig, pm):
+        # print("mlp forward_layer")
         y = np.matmul(x, pm['w']) + pm['b']  # (10,30000)*(30000,10)+(10) = (10,10)
         if hconfig is not None:
             y = mu.relu(y)  # mathutil의 relu호출 y(10,10)
         return y, [x, y]
 
     def backprop_layer(self, G_y, hconfig, pm, aux):
+        # print("mlp backprop_layer")
         x, y = aux
 
         if hconfig is not None:
@@ -144,29 +156,35 @@ class MlpModel(ModelBase):
         return G_input
 
     def forward_postproc(self, output, y):
+        # print("mlp forward_postproc")
         loss, aux_loss = self.dataset.dataset_forward_postproc(output, y)  # dataset의 dataseT_forward_postproc호출
         extra, aux_extra = self.forward_extra_cost(y)
         return loss + extra, [aux_loss, aux_extra]
 
     def forward_extra_cost(self, y):
+        # print("mlp forward_extra_cost")
         return 0, None
 
     def backprop_postproc(self, G_loss, aux):
+        # print("mlp backprop_postproc")
         aux_loss, aux_extra = aux
         self.backprop_extra_cost(G_loss, aux_extra)
         G_output = self.dataset.dataset_backprop_postproc(G_loss, aux_loss)  # dataset의 datset.backprop_postproc호출
         return G_output
 
     def backprop_extra_cost(self, G_loss, aux_extra):
+        # print("mlp backprop_extra_cost")
         pass
 
     def eval_accuracy(self, x, y, output=None):
+        # print("mlp eval_accuracy")
         if output is None:
             output, _ = self.forward_neuralnet(x)
         accuracy = self.dataset.dataset_eval_accuracy(x, y, output)
         return accuracy
 
     def get_estimate(self, x):
+        # print("mlp get_estimate")
         output, _ = self.forward_neuralnet(x)
         estimate = self.dataset.dataset_get_estimate(output)
         return estimate
