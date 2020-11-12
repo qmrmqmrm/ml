@@ -4,8 +4,8 @@ import class_model.mathutil as mu
 
 
 class Regression(DataSet):
-    def __init__(self, name, mode):
-        super(Regression, self).__init__(name, mode)
+    def __init__(self, name):
+        super(Regression, self).__init__(name)
 
     def dataset_forward_postproc(self, output, y):
         # print("regression dataset_forward_postproc")
@@ -46,8 +46,8 @@ class Regression(DataSet):
 
 
 class Binary(DataSet):
-    def __init__(self, name, mode):
-        super(Binary, self).__init__(name, mode)
+    def __init__(self, name):
+        super(Binary, self).__init__(name)
 
     def dataset_forward_postproc(self, output, y):
         # print("Binary dataset_forward_postproc")
@@ -88,8 +88,8 @@ class Binary(DataSet):
 
 
 class Select(DataSet):
-    def __init__(self, name, mode):
-        super(Select, self).__init__(name, mode)
+    def __init__(self, name):
+        super(Select, self).__init__(name)
 
     def dataset_forward_postproc(self, output, y):
         # print("Select dataset_forward_postproc")

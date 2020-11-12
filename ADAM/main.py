@@ -9,9 +9,9 @@ import ADAM.adam_model as am
 
 def main():
 
-    data = dm.Select('office31', 'select')
+    data = dm.Select('office31')
     om2 = am.AdamModel('office31',data,[64,32,10], use_adam=True)
-    om2.exec_all(epoch_count=20,report=10,learning_rate=0.0001)
+    om2.exec_all(epoch_count=50,report=10,learning_rate=0.0001)
 
 
 

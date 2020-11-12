@@ -4,29 +4,15 @@ import numpy as np
 import os
 
 
-class DataSet(DatasetBase):
-    def __init__(self, name, mode):
-        super(DataSet, self).__init__(name, mode)
+class abaloneDataSet(DatasetBase):
+    def __init__(self, name):
+        super(DataSet, self).__init__(name)
         # print("dataset init")
         resolution = [100, 100]
         input_shape = [-1]
+        self.initialize()
         if self.name == 'abalone':
-            rows, _ = mu.load_csv('../data/abalone.csv')
 
-            xs = np.zeros([len(rows), 10])
-            ys = np.zeros([len(rows), 1])
-
-            for n, row in enumerate(rows):
-                if row[0] == 'I':
-                    xs[n, 0] = 1
-                if row[0] == 'M':
-                    xs[n, 1] = 1
-                if row[0] == 'F':
-                    xs[n, 2] = 1
-                xs[n, 3:] = row[1:-1]
-                ys[n, :] = row[-1:]
-
-            self.dataset_shuffle_data(xs, ys, 0.8)
 
         elif self.name == 'pulsar':
             rows, _ = mu.load_csv('../data/pulsar_stars.csv')
@@ -106,6 +92,24 @@ class DataSet(DatasetBase):
             print(type(self.target_names[0]))
             self.cnts = [len(domain_names)]
 
+    def initialize(self):
+        rows, _ = mu.load_csv('../data/abalone.csv')
+
+        xs = np.zeros([len(rows), 10])
+        ys = np.zeros([len(rows), 1])
+
+        for n, row in enumerate(rows):
+            if row[0] == 'I':
+                xs[n, 0] = 1
+            if row[0] == 'M':
+                xs[n, 1] = 1
+            if row[0] == 'F':
+                xs[n, 2] = 1
+            xs[n, 3:] = row[1:-1]
+            ys[n, :] = row[-1:]
+
+        self.dataset_shuffle_data(xs, ys, 0.8)
+
     def dataset_get_train_data(self, batch_size, nth):
         # print("dataset dataset_get_train_data")
         from_idx = nth * batch_size
@@ -163,19 +167,6 @@ class DataSet(DatasetBase):
         self.input_shape = xs[0].shape  # 30000
         # print(self.input_shape)
         self.output_shape = ys[0].shape  # 5
-        return indices[tr_from:tr_to], indices[va_from:va_to], indices[te_from:te_to]
-
-    def dataset_forward_postproc(self, output, y):
-        pass
-
-    def dataset_backprop_postproc(self, G_loss, aux):
-        pass
-
-    def dataset_eval_accuracy(self, x, y, output):
-        pass
-
-    def dataset_get_estimate(self, output):
-        pass
 
     def visualize(self, xs, estimates, answers):
         # print("dataset visualize")

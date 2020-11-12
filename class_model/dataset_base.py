@@ -2,9 +2,8 @@ import numpy as np
 
 
 class DatasetBase:
-    def __init__(self, name, mode):
+    def __init__(self, name):
         self.name = name
-        self.mode = mode
 
     def __str__(self):
         return '{}({}, {}+{}+{})'.format(self.name, self.mode, len(self.tr_xs), len(self.te_xs), len(self.va_xs))
